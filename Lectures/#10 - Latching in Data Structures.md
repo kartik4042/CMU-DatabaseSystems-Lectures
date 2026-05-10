@@ -37,12 +37,13 @@
 **Latch Characteristics and Implementation Goals**  
 - Latches have two modes: **read (shared)** and **write (exclusive)**.  
 - **Read mode** allows multiple concurrent readers; **write mode** permits only one writer with exclusive access.  
-- Compatibility matrix:  
-  | Latch Mode 1 | Latch Mode 2 | Compatible?          |  
-  |--------------|--------------|---------------------|  
-  | Read         | Read         | Yes                 |  
-  | Read         | Write        | No                  |  
-  | Write        | Write        | No                  |  
+- Compatibility matrix:
+
+| Latch Mode 1 | Latch Mode 2 | Compatible? |
+|--------------|--------------|-------------|
+| Read         | Read         | Yes         |
+| Read         | Write        | No          |
+| Write        | Write        | No          |
 - Desired latch properties:  
   - **Small memory footprint** (ideally a few bytes) to embed within data structure nodes/pages.  
   - **Fast, uncontended acquisition path** to minimize overhead.  
@@ -106,12 +107,13 @@
 
 [00:34:22]  
 **Hash Table Latching Strategies**  
-Three latching granularities for hash tables:  
-| Strategy             | Description                                                    | Pros                          | Cons                              |  
-|----------------------|----------------------------------------------------------------|-------------------------------|-----------------------------------|  
-| Global latch         | Single latch protects entire hash table                        | Simple to implement            | Single-threaded bottleneck         |  
-| Page/block latch     | Latch for each page/block in hash table                        | More concurrency than global   | Overhead managing multiple latches |  
-| Slot-level latch     | Latch per slot within pages                                     | Maximum concurrency            | High memory overhead per slot      |  
+Three latching granularities for hash tables:
+
+| Strategy         | Description                                 | Pros                         | Cons                               |
+|------------------|---------------------------------------------|------------------------------|------------------------------------|
+| Global latch     | Single latch protects entire hash table     | Simple to implement          | Single-threaded bottleneck         |
+| Page/block latch | Latch for each page/block in hash table     | More concurrency than global | Overhead managing multiple latches |
+| Slot-level latch | Latch per slot within pages                 | Maximum concurrency          | High memory overhead per slot      |
 
 - Example scenario:  
   - Thread 1 acquires read latch on page to find key.  
@@ -210,28 +212,28 @@ Three latching granularities for hash tables:
 
 ### **Key Terms and Concepts**
 
-| Term                 | Definition                                                                                  |  
-|----------------------|---------------------------------------------------------------------------------------------|  
-| Latch                | Low-level synchronization primitive protecting physical data structure integrity during critical sections. Held briefly in read or write mode. |  
-| Lock                 | Higher-level synchronization primitive controlling transactional logical access and isolation. Held longer for transaction duration. |  
-| Concurrency Control Protocol | Rules governing safe concurrent access to shared database data structures and logical entities. Includes latches and locks. |  
-| Latch Coupling (Latch Crabbing) | Protocol acquiring latches top-down during tree traversal, releasing parent once child latch is acquired and deemed safe. |  
-| Test-and-Set Spinlock | Simple latch implementation using atomic CPU instructions in a tight loop to acquire latch. Efficient when uncontended but wastes CPU cycles if contended. |  
-| Blocking OS Mutex     | OS-level synchronization primitive where threads block and yield CPU if latch unavailable. Higher overhead due to kernel transitions. |  
-| Reader-Writer Lock    | Latch supporting multiple concurrent readers or a single exclusive writer, improving concurrency for read-heavy workloads. |  
-| Write Set             | Local record of changes made by a thread to enable rollback if operation aborts due to latch conflicts. |  
-| No-Wait Protocol      | Concurrency control approach where threads do not wait indefinitely for latches, but back off and retry to avoid deadlocks. |  
+| Term                             | Definition                                                                                                                                      |
+|----------------------------------|-------------------------------------------------------------------------------------------------------------------------------------------------|
+| Latch                            | Low-level synchronization primitive protecting physical data structure integrity during critical sections. Held briefly in read or write mode. |
+| Lock                             | Higher-level synchronization primitive controlling transactional logical access and isolation. Held longer for transaction duration.           |
+| Concurrency Control Protocol     | Rules governing safe concurrent access to shared database data structures and logical entities. Includes latches and locks.                    |
+| Latch Coupling (Latch Crabbing)  | Protocol acquiring latches top-down during tree traversal, releasing parent once child latch is acquired and deemed safe.                      |
+| Test-and-Set Spinlock            | Simple latch implementation using atomic CPU instructions in a tight loop to acquire latch. Efficient when uncontended but wastes CPU cycles if contended. |
+| Blocking OS Mutex                | OS-level synchronization primitive where threads block and yield CPU if latch unavailable. Higher overhead due to kernel transitions.          |
+| Reader-Writer Lock               | Latch supporting multiple concurrent readers or a single exclusive writer, improving concurrency for read-heavy workloads.                     |
+| Write Set                        | Local record of changes made by a thread to enable rollback if operation aborts due to latch conflicts.                                        |
+| No-Wait Protocol                 | Concurrency control approach where threads do not wait indefinitely for latches, but back off and retry to avoid deadlocks.                    |
 
 ---
 
 ### **Summary Table: Latch Implementation Trade-Offs**
 
-| Implementation Type      | Memory Overhead | Performance When Uncontended | Scalability | OS Calls | Suitability                  |  
-|--------------------------|-----------------|------------------------------|-------------|----------|------------------------------|  
-| Test-and-Set Spinlock    | Very low        | Very fast                    | Poor on NUMA| No       | Simple, fast path, low contention |  
-| Blocking OS Mutex        | Moderate        | Moderate                     | Good        | Yes      | Avoid spin-wait, high contention |  
-| Reader-Writer Lock       | Higher          | Good for reads               | Better      | Sometimes| Read-heavy workloads          |  
-| Advanced Locks (MCS, etc)| Variable        | Adaptive                     | Good        | Mixed    | Production systems            |  
+| Implementation Type       | Memory Overhead | Performance When Uncontended | Scalability  | OS Calls  | Suitability                       |
+|---------------------------|-----------------|------------------------------|--------------|-----------|-----------------------------------|
+| Test-and-Set Spinlock     | Very low        | Very fast                    | Poor on NUMA | No        | Simple, fast path, low contention |
+| Blocking OS Mutex         | Moderate        | Moderate                     | Good         | Yes       | Avoid spin-wait, high contention  |
+| Reader-Writer Lock        | Higher          | Good for reads               | Better       | Sometimes | Read-heavy workloads              |
+| Advanced Locks (MCS, etc) | Variable        | Adaptive                     | Good         | Mixed     | Production systems                |
 
 ---
 
