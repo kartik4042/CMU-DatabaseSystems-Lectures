@@ -1,0 +1,23 @@
+Important Interview Answer Structure
+
+If interviewer asks:
+
+"Have you used GDB?"
+
+Good answer:
+
+Strong Interview Answer
+
+“Yes, mainly for analyzing production crashes and multithreaded issues. Usually my approach is:
+
+First understand the symptom from logs and monitoring
+Collect core dump or attach to live process
+Use GDB to inspect stack traces using bt
+Identify crashing thread and function
+Inspect local variables using p and info locals
+For multithreaded issues use info threads and thread apply all bt
+Correlate stack trace with source code and logs
+Reproduce issue locally if possible
+Validate fix using debugger and stress testing”
+
+That sounds strong and practical.
